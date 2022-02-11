@@ -5,6 +5,8 @@
 
 const date = new Date();
 let pressureChart;
+let prevPressureData;
+let pressureData;
 
 document.getElementById("year").textContent = date.getFullYear();
 document.getElementById("refresh").addEventListener("click", refreshData);
@@ -26,9 +28,13 @@ async function fetchData() {
     "https://api.openweathermap.org/data/2.5/onecall?lat=38.74&lon=-82.99&units=imperial&exclude=minutely,daily,alerts&appid=345279e6dedde84e96c5cf9072b109b0"
   );
   const data = await response.json();
-  const pressureData = data.hourly.map((weather) => weather.pressure);
-
+  pressureData = data.hourly.map((weather) => weather.pressure);
   chartData(pressureData);
+
+  // Save pressureData. If the next set of pressure data is the same then the
+  // chart will no be redrawn. A shallow copy is appropriate here because the
+  // data is simple.
+  prevPressureData = [...pressureData];
 }
 
 //-----------------------------------------------------------------------------
@@ -66,12 +72,19 @@ function chartData(pressureData) {
 }
 
 //-----------------------------------------------------------------------------
-// Destroy current chart and get new data. This called when the Refresh Chart
-// button is clicked.
+// Destroy current chart and get new data. This is called when the Refresh
+// Chart button is clicked.
 //-----------------------------------------------------------------------------
 
 function refreshData() {
-  const ctx = document.getElementById("pressureChart").getContext("2d");
-  pressureChart.destroy();
-  fetchData();
+  // Do not redraw the chart if the pressure data is unchanged. The use of
+  // JSON.stringify is appropriate here because the data is simple.
+  if (
+    prevPressureData === "undefined" ||
+    JSON.stringify(pressureData) !== JSON.stringify(prevPressureData)
+  ) {
+    const ctx = document.getElementById("pressureChart").getContext("2d");
+    pressureChart.destroy();
+    fetchData();
+  }
 }

@@ -79,12 +79,12 @@ function chartData(pressureData) {
 function refreshData() {
   // Do not redraw the chart if the pressure data is unchanged. The use of
   // JSON.stringify is appropriate here because the data is simple.
-  if (
-    prevPressureData === "undefined" ||
-    JSON.stringify(pressureData) !== JSON.stringify(prevPressureData)
-  ) {
-    const ctx = document.getElementById("pressureChart").getContext("2d");
-    pressureChart.destroy();
-    fetchData();
-  }
+  //   if (
+  //     prevPressureData === "undefined" ||
+  //     JSON.stringify(pressureData) !== JSON.stringify(prevPressureData)
+  //   ) {
+  const ctx = document.getElementById("pressureChart").getContext("2d");
+  pressureChart.destroy();
+  fetchData();
 }
+// }
